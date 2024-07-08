@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Element Counter</title>
+    <link rel="stylesheet" type="text/css" href="./assets/style.css">
+    <script src="./assets/utils.js"></script>
+</head>
+<body>
+    <div id="loadingDiv" class="loading-overlay">
+        <img src="./assets/loading.gif" alt="Loading...">
+    </div>
+    <form id="myForm">
+        <h1 class="text-center">HTML Elelement Counter for the URL</h1>
+        <div class="form-group marginTop1">
+            <label for="url">URL:</label>
+            <input type="text" id="url" name="url" required placeholder="Please enter valid url.(ex: https://colnect.com/en)" maxlength="2000">
+        </div>
+        <div class="form-group marginTop1">
+            <label for="TAG">Element:</label>
+            <input type="text" id="TAG" name="TAG" required placeholder="Please enter valid html tag name.(ex: img)" maxlength="16">
+        </div>
+        <br>
+        <input type="checkbox" id="statistics" name="statistics" checked>
+        <label for="statistics">Requre statistics</label>
+        <br>
+        <button type="submit" id="submitButton" class="marginTop1 btn btn-primary">Submit</button>
+    </form>
+    <div id="resultGroup" class="marginTop1 display-none">
+        <h3>Request results:</h3>
+        <div id="resultDiv"></div>
+    </div>
+    <div id="statisticsGroup" class="marginTop1 display-none">
+        <h3>General Statistics:</h3>
+        <div id="statisticsDiv"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('myForm');
+
+        const resultGroup = document.getElementById('resultGroup');
+        const resultDiv = document.getElementById('resultDiv');
+
+        const statisticsGroup = document.getElementById('statisticsGroup');
+        const statisticsDiv = document.getElementById('statisticsDiv');
+        
+        const submitButton = document.getElementById('submitButton');
+        const loadingDiv = document.getElementById('loadingDiv');
+
+        form.url.value = "https://colnect.com/en";
+        form.TAG.value = "img";
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = filterValue(form.url.value);
+            const tag = filterValue(form.TAG.value);
+
+            if (!validateURL(url)) {
+                showResult(resultGroup, resultDiv, "Please input valid URL");
+                return;
+            }
+            if (!validateTag(tag)) {
+                showResult(resultGroup, resultDiv, "Please input valid Tag name");
+                return;
+            }
+
+            enableDisable(submitButton, false);
+            showHideItem(loadingDiv, true, "flex");
+
+            // Submit data via AJAX
+            try {
+                const response = await fetch('./colnect/api/v1/count-tags.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        url, 
+                        tag, 
+                        statistics: form.statistics.checked 
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                // Parse and display result and statistics
+                if (data && data.error)
+                    showResult(resultGroup, resultDiv, data.error);
+                else {
+                    showResult(resultGroup, resultDiv, data ? data.result : "No response data.");
+                    showResult(statisticsGroup, statisticsDiv, data ? data.statistics : null);
+                }
+            } catch (error) {
+                showResult(resultGroup, resultDiv, error);
+            }
+
+            enableDisable(submitButton, true);
+            showHideItem(loadingDiv, false);
+        });
+
+        function filterValue(value) {
+            return value ? value.trim().toLowerCase() : value;
+        }
+
+        function showResult(group, div, messsage) {
+            if (group && div) {
+                if (messsage && messsage.length) {
+                    // div.textContent = messsage;
+                    div.innerHTML = messsage;
+                    showHideItem(group, true);
+                } else {
+                    showHideItem(group, false);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

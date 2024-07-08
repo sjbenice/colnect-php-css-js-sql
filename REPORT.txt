@@ -1,0 +1,38 @@
+1. The URL where we can see this project(hostinger.com)
+    https://36e9-38-170-181-10.ngrok-free.app/
+    
+2. Archive with all files needed for deployment with a short explanation on how to do it. Include the details of software used where it's deployed and browsers on which it was tested.
+
+- Archive with all files needed for deployment
+    Send as attach file:src.zip
+
+- short explanation
+    * client : await fetch(...), style.css, trim and validate URL/TAG
+        No framework used
+    * server : /api/v1/count-tags.php,
+        MemoryCache, MySQLConnectionPool, trim and validate URL/TAG,
+        Invalid URL / Inaccessible URL / Invalid HTML content,
+        curl_setopt($curl_handle, CURLOPT_USERAGENT, ...)
+        $stmt->bind_param(...)
+        header("Access-Control-Allow-Origin: *");
+        mysqli used only
+    * db : tables of request, domain, url, element
+        unique indexing name fields of domain, url, element
+        stored procuderes of create_log, get_stats
+        use FK
+    * lint : PHPlint, ESLint, CSSlint HTMLlint for VS code
+
+- details of software used where it's deployed
+    ngrok to get public ip
+
+- browsers on which it was tested
+    Google Chrome 125.0.6422.142
+    Mozilla Firefox 127.0
+    Microsoft Edge 126.0.2592.56
+
+3. Track the time it took you to complete this project. Write how much time went into planning, development of each part, testing, deployment.
+- complete this project : 16 hours
+    * planning : 2 hour
+    * development of each part : html+js+css(4 hours), php(6 hours), db(2 hours)
+    * testing : 1 hour
+    * deployment : 1 hour
